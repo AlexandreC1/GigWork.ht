@@ -9,14 +9,18 @@ import { useTranslation } from '../hooks/useTranslation';
 const LoginPage: React.FC = () => {
   const [name, setName] = useState('');
   const [role, setRole] = useState<UserRole>(UserRole.Customer);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
   const { t } = useTranslation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
-      login(name, role);
+    if (name.trim() && !isLoading) {
+      setIsLoading(true);
+      await login(name, role);
+      // navigation will happen automatically if user state changes, but for clarity:
+      setIsLoading(false);
       navigate('/');
     }
   };
@@ -66,8 +70,8 @@ const LoginPage: React.FC = () => {
               </button>
             </div>
           </div>
-          <Button type="submit" className="w-full text-lg">
-            {t('login_button')}
+          <Button type="submit" className="w-full text-lg" disabled={isLoading}>
+            {isLoading ? t('login_logging_in') : t('login_button')}
           </Button>
         </form>
       </div>

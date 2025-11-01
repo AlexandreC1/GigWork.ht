@@ -1,7 +1,6 @@
-
 import { Gig, User, Review, UserRole } from './types';
 
-export const USERS: User[] = [
+export let USERS: User[] = [
   {
     id: 'user-1',
     name: 'Jean-Pierre',
@@ -16,7 +15,8 @@ export const USERS: User[] = [
       'https://picsum.photos/seed/work1/400/300',
       'https://picsum.photos/seed/work2/400/300',
       'https://picsum.photos/seed/work3/400/300',
-    ]
+    ],
+    favorites: ['gig-2']
   },
   {
     id: 'user-2',
@@ -31,7 +31,8 @@ export const USERS: User[] = [
      portfolioImages: [
       'https://picsum.photos/seed/work4/400/300',
       'https://picsum.photos/seed/work5/400/300',
-    ]
+    ],
+    favorites: []
   },
   {
     id: 'user-3',
@@ -40,10 +41,11 @@ export const USERS: User[] = [
     avatar: 'https://picsum.photos/seed/user3/200/200',
     rating: 0,
     reviewsCount: 0,
+    favorites: ['gig-1', 'gig-4']
   }
 ];
 
-export const GIGS: Gig[] = [
+export let GIGS: Gig[] = [
   {
     id: 'gig-1',
     workerId: 'user-1',
@@ -90,10 +92,10 @@ export const GIGS: Gig[] = [
   }
 ];
 
-export const REVIEWS: Review[] = [
-    { id: 'rev-1', reviewerId: 'user-3', rating: 5, comment: 'Jean-Pierre fixed my sink in no time! Very professional and friendly. Highly recommend!'},
-    { id: 'rev-2', reviewerId: 'user-4', rating: 4, comment: 'Good work, but was a little late. The final result was great though.'},
-    { id: 'rev-3', reviewerId: 'user-5', rating: 5, comment: 'Absolutely amazing painter. My living room looks brand new.'},
+export let REVIEWS: Review[] = [
+    { id: 'rev-1', gigId: 'gig-1', reviewerId: 'user-3', rating: 5, comment: 'Jean-Pierre fixed my sink in no time! Very professional and friendly. Highly recommend!', imageUrl: 'https://picsum.photos/seed/review1/400/300' },
+    { id: 'rev-2', gigId: 'gig-1', reviewerId: 'user-4', rating: 4, comment: 'Good work, but was a little late. The final result was great though.'},
+    { id: 'rev-3', gigId: 'gig-3', reviewerId: 'user-5', rating: 5, comment: 'Absolutely amazing painter. My living room looks brand new.'},
 ];
 
 export const CATEGORIES = ['All', 'Home Repair', 'Cleaning', 'Cooking', 'Child Care', 'Delivery', 'Tutoring'];

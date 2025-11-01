@@ -1,52 +1,80 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
-import { GIGS, USERS } from '../constants';
+import { Gig, User } from '../types';
+import { apiService } from '../services/apiService';
 import { useAuth } from '../hooks/useAuth';
 import Button from '../components/Button';
 import Modal from '../components/Modal';
+import Loader from '../components/Loader';
 import { useTranslation } from '../hooks/useTranslation';
+
+interface Message {
+    id: string;
+    sender: 'user' | 'worker';
+    text: string;
+}
 
 const BookingPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { t } = useTranslation();
   
-  const [messages, setMessages] = useState([
+  const [gig, setGig] = useState<Gig | null>(null);
+  const [worker, setWorker] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const [messages, setMessages] = useState<Message[]>([
     { id: '1', sender: 'worker', text: 'Hello! I see you are interested in my service. How can I help you today?' },
   ]);
   const [newMessage, setNewMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  const gig = GIGS.find(g => g.id === id);
+  useEffect(() => {
+    if (!id) {
+        setIsLoading(false);
+        return;
+    };
+
+    const loadData = async () => {
+        setIsLoading(true);
+        const fetchedGig = await apiService.fetchGigById(id);
+        if (fetchedGig) {
+            const fetchedWorker = await apiService.fetchUserById(fetchedGig.workerId);
+            setGig(fetchedGig);
+            setWorker(fetchedWorker || null);
+        }
+        setIsLoading(false);
+    }
+    loadData();
+  }, [id]);
+
   if (!user) return <Navigate to="/login" />;
-  if (!gig) return <p>{t('gig_detail_not_found')}</p>;
 
-  const worker = USERS.find(u => u.id === gig.workerId);
-  if (!worker) return <p>{t('gig_detail_worker_not_found')}</p>;
-
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newMessage.trim()) {
-      setMessages([...messages, { id: Date.now().toString(), sender: 'user', text: newMessage }]);
+    if (newMessage.trim() && !isSending && gig) {
+      setIsSending(true);
+      const tempText = newMessage;
       setNewMessage('');
-      // Simulate worker reply
-      setTimeout(() => {
-        setMessages(prev => [...prev, {id: Date.now().toString(), sender: 'worker', text: 'Thank you for your message. I will be with you shortly.'}]);
-      }, 1500);
+      setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'user', text: tempText }]);
+      
+      await apiService.postMessage(gig.id, tempText);
+      const botResponse = await apiService.getBotResponse(tempText);
+      setMessages(prev => [...prev, botResponse]);
+
+      setIsSending(false);
     }
   };
   
-  const handlePayment = () => {
+  const handlePayment = async () => {
+    if (!gig) return;
     setIsModalOpen(true);
     setPaymentStatus('pending');
-    // Simulate MonCash API call
-    setTimeout(() => {
-      // Simulate success/failure randomly
-      const success = Math.random() > 0.2;
-      setPaymentStatus(success ? 'success' : 'failed');
-    }, 3000);
+    const result = await apiService.processPayment(gig.id);
+    setPaymentStatus(result.success ? 'success' : 'failed');
   };
   
   const renderPaymentStatus = () => {
@@ -61,6 +89,9 @@ const BookingPage: React.FC = () => {
         return null;
     }
   }
+
+  if (isLoading) return <Loader text={t('loading_booking_details')} />;
+  if (!gig || !worker) return <p className="text-center text-red-500">{t('gig_detail_not_found')}</p>;
 
   return (
     <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -98,8 +129,9 @@ const BookingPage: React.FC = () => {
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder={t('booking_chat_placeholder')}
             className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+            disabled={isSending}
           />
-          <Button type="submit">{t('booking_chat_send')}</Button>
+          <Button type="submit" disabled={isSending}>{isSending ? '...' : t('booking_chat_send')}</Button>
         </form>
       </div>
       

@@ -1,10 +1,11 @@
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Rating from '../components/Rating';
 import { UserRole } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
+import Button from '../components/Button';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -18,16 +19,30 @@ const ProfilePage: React.FC = () => {
     <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-xl">
       <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left md:space-x-8">
         <img src={user.avatar} alt={user.name} className="w-40 h-40 rounded-full object-cover border-4 border-brand-primary shadow-lg -mt-20" />
-        <div className="mt-4 md:mt-0">
-          <h1 className="text-4xl font-bold text-brand-dark">{user.name}</h1>
-          <p className={`mt-1 text-lg font-semibold ${user.role === UserRole.Worker ? 'text-brand-primary' : 'text-green-600'}`}>
-            {user.role === UserRole.Worker ? t('role_worker') : t('role_customer')}
-          </p>
-          {user.role === UserRole.Worker && (
-            <div className="mt-2">
-              <Rating rating={user.rating} reviewCount={user.reviewsCount} />
+        <div className="mt-4 md:mt-0 flex-grow">
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-bold text-brand-dark">{user.name}</h1>
+              <p className={`mt-1 text-lg font-semibold ${user.role === UserRole.Worker ? 'text-brand-primary' : 'text-green-600'}`}>
+                {user.role === UserRole.Worker ? t('role_worker') : t('role_customer')}
+              </p>
+              {user.role === UserRole.Worker && (
+                <div className="mt-2 flex justify-center sm:justify-start">
+                  <Rating rating={user.rating} reviewCount={user.reviewsCount} />
+                </div>
+              )}
             </div>
-          )}
+             <div className="flex items-center gap-4 mt-4 sm:mt-0">
+                 {user.role === UserRole.Worker && (
+                    <Link to="/add-gig">
+                        <Button variant="secondary">{t('profile_add_gig_button')}</Button>
+                    </Link>
+                 )}
+                 <Link to="/profile/edit">
+                    <Button variant="outline">{t('profile_edit_button')}</Button>
+                 </Link>
+            </div>
+          </div>
         </div>
       </div>
       

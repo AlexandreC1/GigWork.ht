@@ -1,4 +1,3 @@
-
 export enum UserRole {
   Customer = 'CUSTOMER',
   Worker = 'WORKER',
@@ -15,6 +14,7 @@ export interface User {
   skills?: string[];
   portfolioImages?: string[];
   availabilities?: string;
+  favorites?: string[];
 }
 
 export interface Gig {
@@ -27,13 +27,16 @@ export interface Gig {
   eta: string;
   distance: string;
   image: string;
+  worker?: User;
 }
 
 export interface Review {
   id: string;
+  gigId: string;
   reviewerId: string;
   rating: number;
   comment: string;
+  imageUrl?: string;
 }
 
 export interface Message {
@@ -45,6 +48,15 @@ export interface Message {
 
 export interface AuthContextType {
   user: User | null;
-  login: (name: string, role: UserRole) => void;
+  login: (name: string, role: UserRole) => Promise<void>;
   logout: () => void;
+  updateUser: (updatedUser: User) => void;
+}
+
+export interface FavoritesContextType {
+  favoriteIds: string[];
+  addFavorite: (gigId: string) => Promise<void>;
+  removeFavorite: (gigId: string) => Promise<void>;
+  isFavorite: (gigId: string) => boolean;
+  isLoading: boolean;
 }

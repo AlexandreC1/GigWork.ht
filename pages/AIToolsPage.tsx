@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { UserRole } from '../types';
 import { generateGigDescription, getDisputeResolutionSuggestion } from '../services/geminiService';
@@ -10,6 +10,7 @@ import { useTranslation } from '../hooks/useTranslation';
 const AIToolsPage: React.FC = () => {
   const { user } = useAuth();
   const { t, language } = useTranslation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('description');
   
   // State for Gig Description Generator
@@ -48,6 +49,10 @@ const AIToolsPage: React.FC = () => {
     alert(t('ai_tools_copied'));
   }
 
+  const useDescription = () => {
+    navigate('/add-gig', { state: { description: generatedDesc } });
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold text-center mb-8">{t('ai_tools_title')}</h1>
@@ -75,12 +80,17 @@ const AIToolsPage: React.FC = () => {
             {isDescLoading ? t('ai_tools_desc_loading') : t('ai_tools_desc_button')}
           </Button>
           {generatedDesc && (
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg relative">
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <h3 className="font-semibold text-blue-900">{t('ai_tools_desc_result_title')}</h3>
-              <p className="text-blue-800 whitespace-pre-wrap">{generatedDesc}</p>
-              <button onClick={() => copyToClipboard(generatedDesc)} className="absolute top-2 right-2 bg-blue-100 text-blue-700 p-1 rounded-md hover:bg-blue-200">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-              </button>
+              <p className="text-blue-800 whitespace-pre-wrap mb-4">{generatedDesc}</p>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => copyToClipboard(generatedDesc)}>
+                  {t('ai_tools_copy_button')}
+                </Button>
+                 <Button variant="primary" onClick={useDescription}>
+                  {t('ai_tools_use_description_button')}
+                </Button>
+              </div>
             </div>
           )}
         </div>

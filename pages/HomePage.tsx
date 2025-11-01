@@ -1,15 +1,39 @@
 
-import React, { useState } from 'react';
-import { GIGS, CATEGORIES } from '../constants';
+import React, { useState, useEffect } from 'react';
+import { CATEGORIES } from '../constants';
+import { Gig } from '../types';
+import { apiService } from '../services/apiService';
 import GigCard from '../components/GigCard';
+import Loader from '../components/Loader';
 import { useTranslation } from '../hooks/useTranslation';
 
 const HomePage: React.FC = () => {
+  const [gigs, setGigs] = useState<Gig[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const { t } = useTranslation();
 
-  const filteredGigs = GIGS.filter(gig => {
+  useEffect(() => {
+    const loadGigs = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const fetchedGigs = await apiService.fetchGigs();
+        setGigs(fetchedGigs);
+      } catch (err) {
+        setError(t('error_fetch_gigs'));
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadGigs();
+  }, [t]);
+
+
+  const filteredGigs = gigs.filter(gig => {
     const matchesCategory = selectedCategory === 'All' || gig.category === selectedCategory;
     const matchesSearch = gig.title.toLowerCase().includes(searchTerm.toLowerCase()) || gig.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -46,14 +70,19 @@ const HomePage: React.FC = () => {
           </button>
         ))}
       </div>
+      
+      {isLoading && <Loader text={t('loading')} />}
+      {error && <p className="text-center text-red-500 mt-8">{error}</p>}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredGigs.length > 0 ? (
-          filteredGigs.map(gig => <GigCard key={gig.id} gig={gig} />)
-        ) : (
-          <p className="col-span-full text-center text-gray-500 mt-8">{t('home_no_gigs')}</p>
-        )}
-      </div>
+      {!isLoading && !error && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredGigs.length > 0 ? (
+            filteredGigs.map(gig => <GigCard key={gig.id} gig={gig} />)
+          ) : (
+            <p className="col-span-full text-center text-gray-500 mt-8">{t('home_no_gigs')}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
