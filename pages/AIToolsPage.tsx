@@ -6,10 +6,12 @@ import { UserRole } from '../types';
 import { generateGigDescription, getDisputeResolutionSuggestion } from '../services/geminiService';
 import Button from '../components/Button';
 import { useTranslation } from '../hooks/useTranslation';
+import { useToast } from '../hooks/useToast';
 
 const AIToolsPage: React.FC = () => {
   const { user } = useAuth();
   const { t, language } = useTranslation();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('description');
   
@@ -46,7 +48,7 @@ const AIToolsPage: React.FC = () => {
   
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    alert(t('ai_tools_copied'));
+    showToast(t('ai_tools_copied'), 'info');
   }
 
   const useDescription = () => {

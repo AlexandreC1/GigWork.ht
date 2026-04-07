@@ -8,6 +8,7 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import Loader from '../components/Loader';
 import { useTranslation } from '../hooks/useTranslation';
+import { sanitizeText } from '../utils/sanitize';
 
 interface Message {
     id: string;
@@ -117,7 +118,7 @@ const BookingPage: React.FC = () => {
           {messages.map(msg => (
             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`rounded-xl p-3 max-w-xs ${msg.sender === 'user' ? 'bg-brand-primary text-white' : 'bg-gray-200 text-brand-dark'}`}>
-                {msg.text}
+                {sanitizeText(msg.text)}
               </div>
             </div>
           ))}

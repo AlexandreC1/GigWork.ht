@@ -11,12 +11,15 @@ import StarRatingInput from '../components/StarRatingInput';
 import Modal from '../components/Modal';
 import GigCard from '../components/GigCard';
 import SocialShareButtons from '../components/SocialShareButtons';
+import { sanitizeText, sanitizeUrl } from '../utils/sanitize';
+import { useToast } from '../hooks/useToast';
 
 const GigDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { showToast } = useToast();
   
   const [gig, setGig] = useState<Gig | null>(null);
   const [worker, setWorker] = useState<User | null>(null);
@@ -91,9 +94,19 @@ const GigDetailPage: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setNewReviewPhoto(file);
-      setPhotoPreview(URL.createObjectURL(file));
+      setPhotoPreview(prev => {
+        if (prev) URL.revokeObjectURL(prev);
+        return URL.createObjectURL(file);
+      });
     }
   };
+
+  // Revoke the preview object URL when the component unmounts or the preview changes.
+  useEffect(() => {
+    return () => {
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+    };
+  }, [photoPreview]);
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +127,10 @@ const GigDetailPage: React.FC = () => {
         setNewRating(0);
         setNewComment('');
         setNewReviewPhoto(null);
-        setPhotoPreview(null);
+        setPhotoPreview(prev => {
+          if (prev) URL.revokeObjectURL(prev);
+          return null;
+        });
       } catch (error) {
         console.error("Failed to submit review:", error);
       } finally {
@@ -128,11 +144,11 @@ const GigDetailPage: React.FC = () => {
     try {
       await apiService.deleteGig(gig.id);
       setIsDeleteModalOpen(false);
-      alert('Gig deleted successfully!');
+      showToast('Gig deleted successfully!', 'success');
       navigate('/profile');
     } catch (error) {
       console.error("Failed to delete gig:", error);
-      alert('Failed to delete gig. Please try again.');
+      showToast('Failed to delete gig. Please try again.', 'error');
     }
   };
 
@@ -212,13 +228,13 @@ const GigDetailPage: React.FC = () => {
             {reviews.length > 0 ? reviews.map(review => (
               <div key={review.id} className="bg-brand-light p-4 rounded-lg">
                   {review.imageUrl && (
-                    <img src={review.imageUrl} alt="Review" className="mb-4 w-full h-48 object-cover rounded-md" />
+                    <img src={sanitizeUrl(review.imageUrl)} alt="Review" className="mb-4 w-full h-48 object-cover rounded-md" />
                   )}
                   <div className="flex items-center mb-2">
                       <Rating rating={review.rating} reviewCount={0} />
                       <span className="ml-auto text-sm text-gray-500">{t('gig_detail_by_customer')}</span>
                   </div>
-                  <p className="text-gray-800">{review.comment}</p>
+                  <p className="text-gray-800">{sanitizeText(review.comment)}</p>
               </div>
             )) : <p className="text-gray-500">{t('gig_detail_no_reviews')}</p>}
           </div>

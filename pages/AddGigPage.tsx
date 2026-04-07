@@ -7,12 +7,15 @@ import { apiService } from '../services/apiService';
 import Button from '../components/Button';
 import { useTranslation } from '../hooks/useTranslation';
 import { CATEGORIES } from '../constants';
+import { useToast } from '../hooks/useToast';
+import { validateRequired, validatePrice } from '../utils/validation';
 
 const AddGigPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const { showToast } = useToast();
 
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(CATEGORIES[1]);
@@ -41,15 +44,34 @@ const AddGigPage: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
+      setImagePreview(prev => {
+        if (prev) URL.revokeObjectURL(prev);
+        return URL.createObjectURL(file);
+      });
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const titleErr = validateRequired(title, 'Title');
+    const descErr = validateRequired(description, 'Description');
+    const priceErr = validatePrice(price);
+    const etaErr = validateRequired(eta, 'ETA');
+    const distErr = validateRequired(distance, 'Distance');
     if (!imageFile) {
-        setError("Please select an image for your gig.");
-        return;
+      setError("Please select an image for your gig.");
+      return;
+    }
+    const firstErr = titleErr || descErr || priceErr || etaErr || distErr;
+    if (firstErr) {
+      setError(firstErr);
+      return;
     }
     setError(null);
     setIsLoading(true);
@@ -71,7 +93,7 @@ const AddGigPage: React.FC = () => {
         image: imageUrl,
       };
       const newGig = await apiService.addGig(gigData, user.id);
-      alert(t('add_gig_success'));
+      showToast(t('add_gig_success'), 'success');
       navigate(`/gig/${newGig.id}`);
     } catch (err) {
       setError(t('error_creating_gig'));

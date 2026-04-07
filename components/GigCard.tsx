@@ -6,6 +6,7 @@ import Rating from './Rating';
 import { useTranslation } from '../hooks/useTranslation';
 import { useFavorites } from '../hooks/useFavorites';
 import { useAuth } from '../hooks/useAuth';
+import { sanitizeText, sanitizeUrl } from '../utils/sanitize';
 
 interface GigCardProps {
   gig: Gig;
@@ -51,15 +52,15 @@ const GigCard: React.FC<GigCardProps> = ({ gig }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-all duration-300 ease-in-out relative">
-      <img className="h-48 w-full object-cover" src={gig.image} alt={gig.title} />
+      <img className="h-48 w-full object-cover" src={sanitizeUrl(gig.image)} alt={sanitizeText(gig.title)} />
       {user && <FavoriteButton gigId={gig.id} />}
       <div className="p-4">
-        <p className="text-sm text-brand-primary font-semibold">{gig.category.toUpperCase()}</p>
-        <h3 className="font-bold text-xl mt-1 mb-2 text-brand-dark">{gig.title}</h3>
+        <p className="text-sm text-brand-primary font-semibold">{sanitizeText(gig.category).toUpperCase()}</p>
+        <h3 className="font-bold text-xl mt-1 mb-2 text-brand-dark">{sanitizeText(gig.title)}</h3>
         <div className="flex items-center mb-3">
-          <img src={worker.avatar} alt={worker.name} className="w-8 h-8 rounded-full object-cover mr-2" />
+          <img src={sanitizeUrl(worker.avatar)} alt={sanitizeText(worker.name)} className="w-8 h-8 rounded-full object-cover mr-2" />
           <div>
-            <p className="text-sm font-medium text-gray-800">{worker.name}</p>
+            <p className="text-sm font-medium text-gray-800">{sanitizeText(worker.name)}</p>
             <Rating rating={worker.rating} reviewCount={worker.reviewsCount} />
           </div>
         </div>

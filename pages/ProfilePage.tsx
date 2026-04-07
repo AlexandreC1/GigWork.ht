@@ -6,6 +6,7 @@ import Rating from '../components/Rating';
 import { UserRole } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/Button';
+import { sanitizeText } from '../utils/sanitize';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -53,7 +54,7 @@ const ProfilePage: React.FC = () => {
               <h2 className="text-2xl font-bold mb-4">{t('skills')}</h2>
               <div className="flex flex-wrap gap-3">
                 {user.skills?.map(skill => (
-                  <span key={skill} className="bg-blue-100 text-blue-800 text-md font-semibold px-4 py-2 rounded-full">{skill}</span>
+                  <span key={skill} className="bg-blue-100 text-blue-800 text-md font-semibold px-4 py-2 rounded-full">{sanitizeText(skill)}</span>
                 ))}
               </div>
             </div>

@@ -6,11 +6,14 @@ import { User, UserRole } from '../types';
 import { apiService } from '../services/apiService';
 import Button from '../components/Button';
 import { useTranslation } from '../hooks/useTranslation';
+import { useToast } from '../hooks/useToast';
+import { validateName, validateMoncashId } from '../utils/validation';
 
 const EditProfilePage: React.FC = () => {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { showToast } = useToast();
   
   const [name, setName] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
@@ -56,6 +59,13 @@ const EditProfilePage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const nameErr = validateName(name);
+    const moncashErr = user.role === UserRole.Worker ? validateMoncashId(moncashId) : null;
+    const firstErr = nameErr || moncashErr;
+    if (firstErr) {
+      setError(firstErr);
+      return;
+    }
     setIsLoading(true);
     setError(null);
     try {
@@ -70,7 +80,7 @@ const EditProfilePage: React.FC = () => {
       
       const updatedUser = await apiService.updateUser(user.id, updatedData);
       updateUser(updatedUser); // Update context
-      alert(t('edit_profile_success'));
+      showToast(t('edit_profile_success'), 'success');
       navigate('/profile');
     } catch (err) {
       setError(t('error_updating_profile'));
