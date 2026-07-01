@@ -1,101 +1,160 @@
-import { Gig, User, Review, UserRole } from './types';
+import { Booking, Gig, PlatformStats, Review, SecurityEvent, User, UserRole } from './types';
 
 export let USERS: User[] = [
   {
     id: 'user-1',
-    name: 'Jean-Pierre',
+    name: 'Mireille Baptiste',
     role: UserRole.Worker,
-    avatar: 'https://picsum.photos/seed/user1/200/200',
-    rating: 4.8,
-    reviewsCount: 25,
-    moncashId: '509-xx-xxxx',
-    skills: ['Plumbing', 'Electrical Repair', 'Painting'],
-    availabilities: 'Mon - Fri, 9am - 5pm',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+    rating: 4.9,
+    reviewsCount: 87,
+    verified: true,
+    phone: '+509 34 00 1020',
+    city: 'Port-au-Prince',
+    joinedAt: '2024-10-12',
+    moncashId: 'mireille-clean',
+    skills: ['Deep cleaning', 'Laundry', 'Move-out reset'],
+    availabilities: 'Mon - Sat, 7:00 - 17:00',
     portfolioImages: [
-      'https://picsum.photos/seed/work1/400/300',
-      'https://picsum.photos/seed/work2/400/300',
-      'https://picsum.photos/seed/work3/400/300',
+      'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=900&q=80',
     ],
-    favorites: ['gig-2']
+    favorites: ['gig-2'],
   },
   {
     id: 'user-2',
-    name: 'Marie-Claire',
+    name: 'Daniel Etienne',
     role: UserRole.Worker,
-    avatar: 'https://picsum.photos/seed/user2/200/200',
-    rating: 4.9,
-    reviewsCount: 42,
-    moncashId: '509-yy-yyyy',
-    skills: ['House Cleaning', 'Cooking', 'Child Care'],
-    availabilities: 'Weekends, 10am - 6pm',
-     portfolioImages: [
-      'https://picsum.photos/seed/work4/400/300',
-      'https://picsum.photos/seed/work5/400/300',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    rating: 4.8,
+    reviewsCount: 64,
+    verified: true,
+    phone: '+509 37 91 4410',
+    city: 'Petion-Ville',
+    joinedAt: '2024-08-03',
+    moncashId: 'daniel-repair',
+    skills: ['Plumbing', 'Solar inverter', 'Electrical diagnostics'],
+    availabilities: 'Daily emergency windows',
+    portfolioImages: [
+      'https://images.unsplash.com/photo-1607400201889-565b1ee75f8e?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=900&q=80',
     ],
-    favorites: []
+    favorites: [],
   },
   {
     id: 'user-3',
-    name: 'Samuel',
+    name: 'Nadine Charles',
     role: UserRole.Customer,
-    avatar: 'https://picsum.photos/seed/user3/200/200',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     rating: 0,
     reviewsCount: 0,
-    favorites: ['gig-1', 'gig-4']
-  }
+    verified: true,
+    city: 'Jacmel',
+    joinedAt: '2025-02-18',
+    favorites: ['gig-1', 'gig-4'],
+  },
+  {
+    id: 'user-4',
+    name: 'Platform Admin',
+    role: UserRole.Admin,
+    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80',
+    rating: 5,
+    reviewsCount: 0,
+    verified: true,
+    city: 'Operations',
+    joinedAt: '2024-01-01',
+    favorites: [],
+  },
 ];
 
 export let GIGS: Gig[] = [
   {
     id: 'gig-1',
-    workerId: 'user-1',
-    title: 'Expert Plumbing Services',
+    workerId: 'user-2',
+    title: 'Same-day plumbing and leak repair',
     category: 'Home Repair',
-    price: 50,
-    description: 'Leaky faucet? Clogged drain? I provide fast and reliable plumbing solutions for all your household needs. With 10 years of experience, I guarantee quality work.',
-    eta: '30 mins',
-    distance: '2km away',
-    image: 'https://picsum.photos/seed/gig1/400/300'
+    price: 65,
+    currency: 'USD',
+    description: 'Fast diagnostics, leak repair, fixture install, and water-pressure troubleshooting with before/after photos and MonCash-ready invoices.',
+    eta: '35 mins',
+    distance: '2.4 km',
+    city: 'Petion-Ville',
+    image: 'https://images.unsplash.com/photo-1607400201889-565b1ee75f8e?auto=format&fit=crop&w=1200&q=80',
+    tags: ['Verified', 'Emergency', 'Warranty'],
+    completedJobs: 141,
   },
   {
     id: 'gig-2',
-    workerId: 'user-2',
-    title: 'Professional House Cleaning',
+    workerId: 'user-1',
+    title: 'Deep clean for homes and short-term rentals',
     category: 'Cleaning',
-    price: 75,
-    description: 'Get your home sparkling clean! I offer thorough and efficient cleaning services, using eco-friendly products. Weekly, bi-weekly, or one-time services available.',
-    eta: '45 mins',
-    distance: '5km away',
-    image: 'https://picsum.photos/seed/gig2/400/300'
+    price: 48,
+    currency: 'USD',
+    description: 'Room-by-room deep cleaning, laundry turnover, supplies checklist, and photo proof for owners managing rentals remotely.',
+    eta: 'Today 14:00',
+    distance: '4.8 km',
+    city: 'Port-au-Prince',
+    image: 'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=1200&q=80',
+    tags: ['Photo proof', 'Supplies included', 'Recurring'],
+    completedJobs: 206,
   },
   {
     id: 'gig-3',
-    workerId: 'user-1',
-    title: 'Interior & Exterior Painting',
-    category: 'Home Repair',
-    price: 300,
-    description: 'Transform your space with a fresh coat of paint. I handle everything from prep work to the final touch, ensuring a professional and long-lasting finish.',
-    eta: '1 hour',
-    distance: '2km away',
-    image: 'https://picsum.photos/seed/gig3/400/300'
-  },
-   {
-    id: 'gig-4',
     workerId: 'user-2',
-    title: 'Authentic Haitian Cuisine Catering',
-    category: 'Cooking',
-    price: 150,
-    description: 'Planning an event? Let me cater with delicious and authentic Haitian dishes that will impress your guests. Griot, Diri ak Djon Djon, and more!',
+    title: 'Solar inverter and battery troubleshooting',
+    category: 'Energy',
+    price: 90,
+    currency: 'USD',
+    description: 'On-site inspection for inverter errors, battery health, wiring safety, and load planning for homes and small businesses.',
+    eta: '60 mins',
+    distance: '6.1 km',
+    city: 'Delmas',
+    image: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1200&q=80',
+    tags: ['Energy', 'Safety check', 'Business'],
+    completedJobs: 73,
+  },
+  {
+    id: 'gig-4',
+    workerId: 'user-1',
+    title: 'Event prep and Haitian catering support',
+    category: 'Food & Events',
+    price: 120,
+    currency: 'USD',
+    description: 'Prep support for griot, diri djon djon, pikliz station, serving setup, kitchen reset, and event cleanup.',
     eta: '1 day notice',
-    distance: '5km away',
-    image: 'https://picsum.photos/seed/gig4/400/300'
-  }
+    distance: '8.0 km',
+    city: 'Jacmel',
+    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=1200&q=80',
+    tags: ['Events', 'Crew available', 'Cleanup'],
+    completedJobs: 38,
+  },
 ];
 
 export let REVIEWS: Review[] = [
-    { id: 'rev-1', gigId: 'gig-1', reviewerId: 'user-3', rating: 5, comment: 'Jean-Pierre fixed my sink in no time! Very professional and friendly. Highly recommend!', imageUrl: 'https://picsum.photos/seed/review1/400/300' },
-    { id: 'rev-2', gigId: 'gig-1', reviewerId: 'user-4', rating: 4, comment: 'Good work, but was a little late. The final result was great though.'},
-    { id: 'rev-3', gigId: 'gig-3', reviewerId: 'user-5', rating: 5, comment: 'Absolutely amazing painter. My living room looks brand new.'},
+  { id: 'rev-1', gigId: 'gig-1', reviewerId: 'user-3', rating: 5, comment: 'Clear price, arrived fast, and sent photos after the repair.' },
+  { id: 'rev-2', gigId: 'gig-2', reviewerId: 'user-3', rating: 5, comment: 'The apartment was guest-ready and the checklist made it easy to verify.' },
+  { id: 'rev-3', gigId: 'gig-3', reviewerId: 'user-3', rating: 4, comment: 'Good diagnostics and practical battery advice.' },
 ];
 
-export const CATEGORIES = ['All', 'Home Repair', 'Cleaning', 'Cooking', 'Child Care', 'Delivery', 'Tutoring'];
+export let BOOKINGS: Booking[] = [
+  { id: 'book-1', gigId: 'gig-1', customerId: 'user-3', workerId: 'user-2', status: 'completed', total: 65, createdAt: '2026-06-02T14:20:00Z' },
+  { id: 'book-2', gigId: 'gig-2', customerId: 'user-3', workerId: 'user-1', status: 'paid', total: 48, createdAt: '2026-06-18T10:45:00Z' },
+  { id: 'book-3', gigId: 'gig-4', customerId: 'user-3', workerId: 'user-1', status: 'requested', total: 120, createdAt: '2026-06-27T19:15:00Z' },
+];
+
+export const PLATFORM_STATS: PlatformStats = {
+  activeGigs: GIGS.length,
+  verifiedWorkers: USERS.filter((user) => user.role === UserRole.Worker && user.verified).length,
+  completedBookings: 1842,
+  disputeRate: 1.7,
+  averageResponseMinutes: 11,
+  monthlyVolume: 48200,
+};
+
+export const SECURITY_EVENTS: SecurityEvent[] = [
+  { id: 'sec-1', severity: 'medium', title: 'Velocity limit applied', detail: 'Blocked repeated booking attempts from one device fingerprint.', status: 'blocked' },
+  { id: 'sec-2', severity: 'low', title: 'Worker verification expiring', detail: '6 workers need ID and MonCash verification refresh this month.', status: 'monitored' },
+  { id: 'sec-3', severity: 'high', title: 'Payment webhook policy', detail: 'Production must validate MonCash signatures before fulfilling bookings.', status: 'monitored' },
+];
+
+export const CATEGORIES = ['All', 'Home Repair', 'Cleaning', 'Energy', 'Food & Events', 'Delivery', 'Tutoring'];

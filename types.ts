@@ -1,7 +1,18 @@
 export enum UserRole {
   Customer = 'CUSTOMER',
   Worker = 'WORKER',
+  Admin = 'ADMIN',
 }
+
+export type Permission =
+  | 'gig:create'
+  | 'gig:update-own'
+  | 'gig:delete-own'
+  | 'booking:create'
+  | 'booking:manage-own'
+  | 'stats:view-own'
+  | 'stats:view-platform'
+  | 'security:view';
 
 export interface User {
   id: string;
@@ -10,6 +21,11 @@ export interface User {
   avatar: string;
   rating: number;
   reviewsCount: number;
+  verified?: boolean;
+  phone?: string;
+  city?: string;
+  joinedAt?: string;
+  permissions?: Permission[];
   moncashId?: string;
   skills?: string[];
   portfolioImages?: string[];
@@ -23,10 +39,14 @@ export interface Gig {
   title: string;
   category: string;
   price: number;
+  currency?: 'USD' | 'HTG';
   description: string;
   eta: string;
   distance: string;
+  city?: string;
   image: string;
+  tags?: string[];
+  completedJobs?: number;
   worker?: User;
 }
 
@@ -41,13 +61,43 @@ export interface Review {
 
 export interface Message {
   id: string;
-  senderId: string;
+  senderId?: string;
+  sender?: string;
   text: string;
-  timestamp: string;
+  timestamp?: string;
+}
+
+export interface Booking {
+  id: string;
+  gigId: string;
+  customerId: string;
+  workerId: string;
+  status: 'requested' | 'accepted' | 'paid' | 'completed' | 'disputed';
+  total: number;
+  createdAt: string;
+}
+
+export interface PlatformStats {
+  activeGigs: number;
+  verifiedWorkers: number;
+  completedBookings: number;
+  disputeRate: number;
+  averageResponseMinutes: number;
+  monthlyVolume: number;
+}
+
+export interface SecurityEvent {
+  id: string;
+  severity: 'low' | 'medium' | 'high';
+  title: string;
+  detail: string;
+  status: 'monitored' | 'blocked' | 'resolved';
 }
 
 export interface AuthContextType {
   user: User | null;
+  isAuthenticated: boolean;
+  hasPermission: (permission: Permission) => boolean;
   login: (name: string, role: UserRole) => Promise<void>;
   logout: () => void;
   updateUser: (updatedUser: User) => void;
